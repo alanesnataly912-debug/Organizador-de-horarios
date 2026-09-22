@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TimeMaster Pro | Organizador Semanal Inteligente</title>
+  <title>TimeMaster Pro | Organizador Semanal Flexible</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Google: Inter -->
@@ -36,7 +36,7 @@
   </script>
 
   <style>
-    /* Estilos personalizados para el scrollbar y cuadrícula de impresión */
+    /* Estilos personalizados para el scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -89,6 +89,7 @@
 
 <body class="bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100 font-sans min-h-screen flex flex-col transition-colors duration-200">
   
+  <!-- Header y barra de navegación -->
   <header class="no-print bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-zinc-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
@@ -100,9 +101,9 @@
         <div>
           <h1 class="font-bold text-lg leading-tight tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
             Organizador Semanal
-            <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800">Pro</span>
+            <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/70 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800">Sin choques / Flexible</span>
           </h1>
-          <p class="text-xs text-slate-500 dark:text-zinc-400 hidden sm:block">Planifica y optimiza tu tiempo semanal con balance y foco</p>
+          <p class="text-xs text-slate-500 dark:text-zinc-400 hidden sm:block">Permite materias paralelas, dobles turnos y horarios compartidos</p>
         </div>
       </div>
 
@@ -128,7 +129,7 @@
           
           <div id="moreActionsMenu" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 shadow-xl border border-slate-100 dark:border-zinc-800 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
             <button onclick="loadDemoSchedule()" class="w-full text-left px-4 py-2 text-xs text-slate-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-600 flex items-center gap-2">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-500"></i> Cargar Horario Demo
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-500"></i> Cargar Horario Ejemplo
             </button>
             <button onclick="clearAllEvents()" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar Todo
@@ -162,7 +163,7 @@
             <div class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Horas Programadas Semanalmente</div>
             <div class="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
               <span id="totalHoursCount">0.0</span> hrs
-              <span id="totalEventsCount" class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">0 bloques</span>
+              <span id="totalEventsCount" class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">0 actividades</span>
             </div>
           </div>
         </div>
@@ -177,7 +178,7 @@
           <label for="categoryFilter" class="text-xs font-semibold text-slate-500 dark:text-zinc-400 whitespace-nowrap">Filtrar:</label>
           <select id="categoryFilter" onchange="renderCalendar()" class="bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="all">Todas las categorías</option>
-            <option value="academic">Académico / Estudio</option>
+            <option value="academic">Académico / Materias</option>
             <option value="work">Trabajo / Proyectos</option>
             <option value="languages">Idiomas</option>
             <option value="wellness">Deporte & Salud</option>
@@ -193,7 +194,7 @@
       
       <!-- Encabezado de los Días -->
       <div class="grid grid-cols-8 border-b border-slate-200 dark:border-zinc-800 bg-slate-100/60 dark:bg-zinc-800/60 font-semibold text-xs text-slate-600 dark:text-zinc-300">
-        <!-- Columna de Horas (Primera Columna) -->
+        <!-- Columna de Horas -->
         <div class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-800 text-slate-400 font-medium">
           <span class="hidden sm:inline">Horario</span>
           <i data-lucide="clock" class="w-4 h-4 mx-auto sm:hidden"></i>
@@ -212,12 +213,13 @@
       <!-- Cuadrícula con Scroll Suave de Horarios -->
       <div id="calendarGridContainer" class="overflow-y-auto max-h-[calc(100vh-290px)] relative select-none">
         <div id="calendarMatrix" class="grid grid-cols-8 relative min-w-[650px]">
-          <!-- Columnas generadas vía JavaScript -->
+          <!-- Generado dinámicamente con JavaScript -->
         </div>
       </div>
     </div>
   </main>
 
+  <!-- Modal para Agregar o Editar Actividades (Sin bloqueos de solapamiento) -->
   <div id="eventModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
     <div class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative transform scale-95 transition-transform duration-200" id="modalDialogBox">
       
@@ -238,10 +240,10 @@
       <form id="activityForm" onsubmit="saveEvent(event)" class="mt-4 space-y-4">
         <input type="hidden" id="eventId">
 
-        <!-- Título -->
+        <!-- Título / Nombre de la materia -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Nombre de la Actividad</label>
-          <input type="text" id="eventTitle" required placeholder="Ej. Inglés B2, Algoritmos, Entrenamiento..." class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Nombre de la Materia / Actividad</label>
+          <input type="text" id="eventTitle" required placeholder="Ej. Cálculo I, Laboratorio, Reunión..." class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
         </div>
 
         <!-- Día y Categoría -->
@@ -262,7 +264,7 @@
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Categoría</label>
             <select id="eventCategory" required class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
-              <option value="academic">📚 Académico / Estudio</option>
+              <option value="academic">📚 Académico / Materias</option>
               <option value="work">💼 Trabajo / Proyectos</option>
               <option value="languages">🌍 Idiomas</option>
               <option value="wellness">💪 Deporte & Salud</option>
@@ -284,13 +286,13 @@
           </div>
         </div>
 
-        <!-- Notas / Aula / Enlace -->
+        <!-- Notas / Aula / Paralelo -->
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Notas o Ubicación (Opcional)</label>
-          <input type="text" id="eventNotes" placeholder="Ej. Aula 204, Zoom, Leer págs. 40-70" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Notas, Aula o Paralelo (Opcional)</label>
+          <input type="text" id="eventNotes" placeholder="Ej. Aula 204, Grupo A, Zoom, etc." class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
 
-        <!-- Mensaje de error / validación -->
+        <!-- Mensaje de error solo para validaciones de formato (por ej. hora fin anterior a hora inicio) -->
         <div id="modalErrorMsg" class="hidden text-xs text-rose-500 font-medium bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-lg border border-rose-200 dark:border-rose-900/60">
         </div>
 
@@ -305,7 +307,7 @@
               Cancelar
             </button>
             <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition">
-              Guardar Actividad
+              Guardar
             </button>
           </div>
         </div>
@@ -313,65 +315,65 @@
     </div>
   </div>
 
+  <!-- Toast de Notificaciones -->
   <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium py-2.5 px-4 rounded-xl shadow-xl">
     <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 dark:text-emerald-600"></i>
     <span id="toastMessage">Acción completada</span>
   </div>
 
   <script>
-    // Parámetros de configuración del horario
+    // Configuración del rango de horario
     const START_HOUR = 6;  // 06:00
-    const END_HOUR = 23;   // 23:00 (17 horas totales)
-    const PIXELS_PER_HOUR = 52; // Altura en píxeles por bloque de hora
+    const END_HOUR = 23;   // 23:00
+    const PIXELS_PER_HOUR = 52; // Altura en px de cada hora
 
-    // Definición de Categorías con paletas de color modernas (Tailwind tokens)
+    // Definición de Categorías y estilos visuales
     const CATEGORIES = {
       academic: {
-        name: 'Académico / Estudio',
-        bg: 'bg-indigo-100/90 dark:bg-indigo-950/70',
+        name: 'Académico / Materias',
+        bg: 'bg-indigo-100/95 dark:bg-indigo-950/80',
         border: 'border-indigo-400 dark:border-indigo-600',
-        text: 'text-indigo-900 dark:text-indigo-200',
+        text: 'text-indigo-950 dark:text-indigo-200',
         indicator: 'bg-indigo-500',
         badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300'
       },
       work: {
         name: 'Trabajo / Proyectos',
-        bg: 'bg-sky-100/90 dark:bg-sky-950/70',
+        bg: 'bg-sky-100/95 dark:bg-sky-950/80',
         border: 'border-sky-400 dark:border-sky-600',
-        text: 'text-sky-900 dark:text-sky-200',
+        text: 'text-sky-950 dark:text-sky-200',
         indicator: 'bg-sky-500',
         badge: 'bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300'
       },
       languages: {
         name: 'Idiomas',
-        bg: 'bg-amber-100/90 dark:bg-amber-950/70',
+        bg: 'bg-amber-100/95 dark:bg-amber-950/80',
         border: 'border-amber-400 dark:border-amber-600',
-        text: 'text-amber-900 dark:text-amber-200',
+        text: 'text-amber-950 dark:text-amber-200',
         indicator: 'bg-amber-500',
         badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300'
       },
       wellness: {
         name: 'Deporte & Salud',
-        bg: 'bg-emerald-100/90 dark:bg-emerald-950/70',
+        bg: 'bg-emerald-100/95 dark:bg-emerald-950/80',
         border: 'border-emerald-400 dark:border-emerald-600',
-        text: 'text-emerald-900 dark:text-emerald-200',
+        text: 'text-emerald-950 dark:text-emerald-200',
         indicator: 'bg-emerald-500',
         badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300'
       },
       personal: {
         name: 'Personal / Ocio',
-        bg: 'bg-fuchsia-100/90 dark:bg-fuchsia-950/70',
+        bg: 'bg-fuchsia-100/95 dark:bg-fuchsia-950/80',
         border: 'border-fuchsia-400 dark:border-fuchsia-600',
-        text: 'text-fuchsia-900 dark:text-fuchsia-200',
+        text: 'text-fuchsia-950 dark:text-fuchsia-200',
         indicator: 'bg-fuchsia-500',
         badge: 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/60 dark:text-fuchsia-300'
       }
     };
 
-    // Colección de eventos guardados en LocalStorage
+    // Colección de eventos
     let events = [];
 
-    // Inicialización del entorno
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       loadEventsFromStorage();
@@ -379,7 +381,7 @@
       renderCalendar();
       lucide.createIcons();
 
-      // Cerrar menú emergente al hacer clic fuera
+      // Cerrar menú emergente
       document.addEventListener('click', (e) => {
         const menu = document.getElementById('moreActionsMenu');
         const btn = document.getElementById('moreActionsBtn');
@@ -431,13 +433,12 @@
       }
       matrix.appendChild(timeCol);
 
-      // Columnas 1 a 7: Días de la semana (Lunes a Domingo)
+      // Columnas 1 a 7: Días de la semana
       for (let day = 1; day <= 7; day++) {
         const dayCol = document.createElement('div');
         dayCol.id = `day-column-${day}`;
         dayCol.className = 'relative border-r border-slate-200 dark:border-zinc-800 last:border-r-0 hover:bg-indigo-50/20 dark:hover:bg-indigo-950/10 transition-colors duration-150 cursor-pointer';
 
-        // Permitir clic para crear un evento rápido a esa hora
         dayCol.addEventListener('click', (e) => {
           if (e.target === dayCol || e.target.classList.contains('time-slot')) {
             const rect = dayCol.getBoundingClientRect();
@@ -451,7 +452,6 @@
           }
         });
 
-        // Crear guías visuales de cada hora
         for (let h = START_HOUR; h < END_HOUR; h++) {
           const slot = document.createElement('div');
           slot.className = 'time-slot';
@@ -462,8 +462,68 @@
       }
     }
 
+    /**
+     * Calcula la posición horizontal (left % y width %) para distribuir
+     * eventos que coincidan en el mismo día y rango de horas de forma lado a lado y legible.
+     */
+    function computeOverlapsForDay(dayEvents) {
+      if (!dayEvents || dayEvents.length === 0) return [];
+
+      const sorted = [...dayEvents].sort((a, b) => {
+        const diff = timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+        if (diff !== 0) return diff;
+        return timeToMinutes(b.endTime) - timeToMinutes(a.endTime);
+      });
+
+      const columns = [];
+
+      sorted.forEach(ev => {
+        const evStart = timeToMinutes(ev.startTime);
+        const evEnd = timeToMinutes(ev.endTime);
+
+        let placed = false;
+        for (let i = 0; i < columns.length; i++) {
+          const lastInCol = columns[i][columns[i].length - 1];
+          if (timeToMinutes(lastInCol.endTime) <= evStart) {
+            columns[i].push(ev);
+            ev._colIndex = i;
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          ev._colIndex = columns.length;
+          columns.push([ev]);
+        }
+      });
+
+      // Calcular grupos conectados concurrentes
+      return sorted.map(ev => {
+        const evStart = timeToMinutes(ev.startTime);
+        const evEnd = timeToMinutes(ev.endTime);
+
+        // Buscar todos los eventos que se crucen con este evento
+        const concurrent = sorted.filter(other => {
+          const oStart = timeToMinutes(other.startTime);
+          const oEnd = timeToMinutes(other.endTime);
+          return (evStart < oEnd && evEnd > oStart);
+        });
+
+        const maxCols = Math.max(...concurrent.map(c => c._colIndex)) + 1;
+        const widthPercent = 100 / maxCols;
+        const leftPercent = ev._colIndex * widthPercent;
+
+        return {
+          event: ev,
+          left: leftPercent,
+          width: widthPercent,
+          hasConflict: concurrent.length > 1
+        };
+      });
+    }
+
     function renderCalendar() {
-      // Limpiar bloques existentes en las columnas de días
+      // Limpiar tarjetas existentes
       for (let d = 1; d <= 7; d++) {
         const dayCol = document.getElementById(`day-column-${d}`);
         if (dayCol) {
@@ -479,50 +539,63 @@
         filteredEvents = events.filter(e => e.category === activeFilter);
       }
 
-      // Dibujar cada bloque según día y horas
-      filteredEvents.forEach(evt => {
-        const dayCol = document.getElementById(`day-column-${evt.day}`);
-        if (!dayCol) return;
+      // Renderizar por cada día usando el algoritmo de columnas lado a lado
+      for (let day = 1; day <= 7; day++) {
+        const dayCol = document.getElementById(`day-column-${day}`);
+        if (!dayCol) continue;
 
-        const startMinutes = timeToMinutes(evt.startTime);
-        const endMinutes = timeToMinutes(evt.endTime);
-        const baseMinutes = START_HOUR * 60;
+        const dayEvents = filteredEvents.filter(e => e.day === day);
+        const positioned = computeOverlapsForDay(dayEvents);
 
-        // Calcular posición vertical y altura
-        const topPx = ((startMinutes - baseMinutes) / 60) * PIXELS_PER_HOUR;
-        const durationHours = (endMinutes - startMinutes) / 60;
-        const heightPx = Math.max(durationHours * PIXELS_PER_HOUR - 2, 24);
+        positioned.forEach(({ event: evt, left, width, hasConflict }) => {
+          const startMinutes = timeToMinutes(evt.startTime);
+          const endMinutes = timeToMinutes(evt.endTime);
+          const baseMinutes = START_HOUR * 60;
 
-        const cat = CATEGORIES[evt.category] || CATEGORIES.academic;
+          const topPx = ((startMinutes - baseMinutes) / 60) * PIXELS_PER_HOUR;
+          const durationHours = (endMinutes - startMinutes) / 60;
+          const heightPx = Math.max(durationHours * PIXELS_PER_HOUR - 2, 24);
 
-        const card = document.createElement('div');
-        card.className = `event-item absolute left-1 right-1 rounded-xl p-2 text-xs border ${cat.bg} ${cat.border} ${cat.text} shadow-sm hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col justify-between group z-10`;
-        card.style.top = `${topPx + 1}px`;
-        card.style.height = `${heightPx}px`;
+          const cat = CATEGORIES[evt.category] || CATEGORIES.academic;
 
-        card.innerHTML = `
-          <div class="leading-snug">
-            <div class="flex items-center justify-between gap-1">
-              <span class="font-bold truncate text-[11px] sm:text-xs">${escapeHtml(evt.title)}</span>
-              <button onclick="deleteEventQuick(event, '${evt.id}')" title="Eliminar rápido" class="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/60 dark:hover:bg-zinc-800 transition">
-                <i data-lucide="x" class="w-3 h-3"></i>
-              </button>
+          const card = document.createElement('div');
+          card.className = `event-item absolute rounded-xl p-2 text-xs border ${cat.bg} ${cat.border} ${cat.text} shadow-sm hover:shadow-md hover:z-30 transition-all duration-150 overflow-hidden flex flex-col justify-between group z-10`;
+          
+          // Asignación de medidas con soporte para superposición fluida
+          card.style.top = `${topPx + 1}px`;
+          card.style.height = `${heightPx}px`;
+          card.style.left = `calc(${left}% + 2px)`;
+          card.style.width = `calc(${width}% - 4px)`;
+
+          // Indicador visual discreto si comparte horario
+          const overlapBadge = hasConflict ? `<span title="Horario compartido/paralelo" class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>` : '';
+
+          card.innerHTML = `
+            <div class="leading-snug">
+              <div class="flex items-center justify-between gap-1">
+                <div class="flex items-center gap-1 min-w-0">
+                  ${overlapBadge}
+                  <span class="font-bold truncate text-[11px] sm:text-xs">${escapeHtml(evt.title)}</span>
+                </div>
+                <button onclick="deleteEventQuick(event, '${evt.id}')" title="Eliminar rápido" class="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/60 dark:hover:bg-zinc-800 transition shrink-0">
+                  <i data-lucide="x" class="w-3 h-3"></i>
+                </button>
+              </div>
+              <div class="text-[10px] font-medium opacity-85 mt-0.5 flex items-center gap-1 truncate">
+                <span>${evt.startTime} - ${evt.endTime}</span>
+              </div>
             </div>
-            <div class="text-[10px] font-medium opacity-80 mt-0.5 flex items-center gap-1">
-              <span>${evt.startTime} - ${evt.endTime}</span>
-            </div>
-          </div>
-          ${evt.notes ? `<div class="text-[10px] opacity-75 truncate mt-auto italic">${escapeHtml(evt.notes)}</div>` : ''}
-        `;
+            ${evt.notes ? `<div class="text-[10px] opacity-75 truncate mt-auto italic">${escapeHtml(evt.notes)}</div>` : ''}
+          `;
 
-        // Al hacer click, abrir para editar
-        card.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openModal(evt.id);
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal(evt.id);
+          });
+
+          dayCol.appendChild(card);
         });
-
-        dayCol.appendChild(card);
-      });
+      }
 
       updateStats();
       lucide.createIcons();
@@ -552,7 +625,6 @@
       document.getElementById('totalHoursCount').innerText = totalHours;
       document.getElementById('totalEventsCount').innerText = `${events.length} actividad${events.length === 1 ? '' : 'es'}`;
 
-      // Actualizar visual de categorías
       const container = document.getElementById('categoryStatsContainer');
       container.innerHTML = '';
 
@@ -638,7 +710,7 @@
 
       const errorBox = document.getElementById('modalErrorMsg');
 
-      // Validaciones lógicas
+      // Validaciones lógicas básicas de formato de hora
       const startMin = timeToMinutes(startTime);
       const endMin = timeToMinutes(endTime);
 
@@ -654,30 +726,17 @@
         return;
       }
 
-      // Validar superposición en el mismo día (opcionalmente amigable)
-      const overlap = events.find(item => {
-        if (id && item.id === id) return false;
-        if (item.day !== day) return false;
-        const itemStart = timeToMinutes(item.startTime);
-        const itemEnd = timeToMinutes(item.endTime);
-        return (startMin < itemEnd && endMin > itemStart);
-      });
-
-      if (overlap) {
-        errorBox.innerText = `Atención: Se superpone con "${overlap.title}" (${overlap.startTime} - ${overlap.endTime}). Ajusta el horario.`;
-        errorBox.classList.remove('hidden');
-        return;
-      }
+      // (NOTA: Se eliminó intencionalmente el bloqueo por choque o solapamiento de horarios)
 
       if (id) {
-        // Actualizar
+        // Actualizar actividad existente
         const index = events.findIndex(item => item.id === id);
         if (index !== -1) {
           events[index] = { id, title, day, category, startTime, endTime, notes };
         }
         showToast('Actividad actualizada con éxito');
       } else {
-        // Crear nuevo
+        // Crear nueva actividad
         const newEvent = {
           id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
           title,
@@ -688,7 +747,7 @@
           notes
         };
         events.push(newEvent);
-        showToast('Actividad añadida al horario');
+        showToast('Actividad añadida');
       }
 
       persistEvents();
@@ -721,7 +780,6 @@
         showToast('No hay actividades para borrar');
         return;
       }
-      // Reemplazo limpio y accesible sin usar confirm()
       events = [];
       persistEvents();
       renderCalendar();
@@ -731,44 +789,37 @@
     function loadDemoSchedule() {
       document.getElementById('moreActionsMenu').classList.add('hidden');
       events = [
-        // Lunes
-        { id: 'd1', title: 'Cálculo Avanzado', day: 1, category: 'academic', startTime: '08:00', endTime: '10:00', notes: 'Aula Magna 301' },
-        { id: 'd2', title: 'Entrenamiento Gimnasio', day: 1, category: 'wellness', startTime: '10:30', endTime: '12:00', notes: 'Fuerza y movilidad' },
-        { id: 'd3', title: 'Desarrollo Proyecto Web', day: 1, category: 'work', startTime: '14:00', endTime: '17:00', notes: 'Sprint Review' },
-        { id: 'd4', title: 'Inglés Conversacional', day: 1, category: 'languages', startTime: '18:00', endTime: '19:30', notes: 'Práctica Discord' },
+        // Ejemplo de choques intencionales para ver la distribución paralela
+        { id: 'd1', title: 'Cálculo Avanzado (Grupo A)', day: 1, category: 'academic', startTime: '08:00', endTime: '10:00', notes: 'Aula 301' },
+        { id: 'd2', title: 'Laboratorio Física (Opcional)', day: 1, category: 'academic', startTime: '08:30', endTime: '10:30', notes: 'Lab 2' },
+        { id: 'd3', title: 'Entrenamiento', day: 1, category: 'wellness', startTime: '11:00', endTime: '12:30', notes: 'Gimnasio' },
+        { id: 'd4', title: 'Desarrollo Proyecto Web', day: 1, category: 'work', startTime: '14:00', endTime: '17:00', notes: 'Sprint' },
 
         // Martes
         { id: 'd5', title: 'Arquitectura Software', day: 2, category: 'academic', startTime: '08:30', endTime: '11:00', notes: 'Módulo Patrones' },
-        { id: 'd6', title: 'Reunión de Equipo', day: 2, category: 'work', startTime: '14:00', endTime: '15:30', notes: 'Google Meet' },
-        { id: 'd7', title: 'Lectura / Ocio', day: 2, category: 'personal', startTime: '19:30', endTime: '21:00', notes: 'Capítulo 5 Sci-Fi' },
+        { id: 'd6', title: 'Reunión de Equipo', day: 2, category: 'work', startTime: '14:00', endTime: '15:30', notes: 'Meet' },
+        { id: 'd7', title: 'Llamada Cliente', day: 2, category: 'work', startTime: '14:30', endTime: '16:00', notes: 'Paralelo / Urgente' },
 
         // Miércoles
-        { id: 'd8', title: 'Estructuras de Datos', day: 3, category: 'academic', startTime: '08:00', endTime: '10:00', notes: 'Laboratorio' },
-        { id: 'd9', title: 'Running & Cardio', day: 3, category: 'wellness', startTime: '10:30', endTime: '11:30', notes: 'Parque central' },
-        { id: 'd10', title: 'Trabajo Remoto', day: 3, category: 'work', startTime: '14:00', endTime: '18:00', notes: 'Implementación API' },
+        { id: 'd8', title: 'Estructuras de Datos', day: 3, category: 'academic', startTime: '08:00', endTime: '10:00', notes: 'Aula Magna' },
+        { id: 'd9', title: 'Trabajo Remoto', day: 3, category: 'work', startTime: '14:00', endTime: '18:00', notes: 'API' },
 
         // Jueves
-        { id: 'd11', title: 'Alemán Básico', day: 4, category: 'languages', startTime: '09:00', endTime: '10:30', notes: 'Vocabulario' },
-        { id: 'd12', title: 'Inteligencia Artificial', day: 4, category: 'academic', startTime: '11:00', endTime: '13:00', notes: 'Redes Neuronales' },
-        { id: 'd13', title: 'Revisión y Tareas', day: 4, category: 'academic', startTime: '16:00', endTime: '18:00', notes: 'Biblioteca' },
+        { id: 'd10', title: 'Alemán Básico', day: 4, category: 'languages', startTime: '09:00', endTime: '10:30', notes: 'Vocabulario' },
+        { id: 'd11', title: 'Inteligencia Artificial', day: 4, category: 'academic', startTime: '11:00', endTime: '13:00', notes: 'Redes' },
 
         // Viernes
-        { id: 'd14', title: 'Gestión de Proyectos', day: 5, category: 'work', startTime: '09:00', endTime: '11:30', notes: 'Entregables' },
-        { id: 'd15', title: 'Yoga & Estiramiento', day: 5, category: 'wellness', startTime: '12:00', endTime: '13:00', notes: 'Relajación' },
-        { id: 'd16', title: 'Salida con Amigos', day: 5, category: 'personal', startTime: '19:00', endTime: '22:00', notes: 'Cena & Café' },
+        { id: 'd12', title: 'Gestión de Proyectos', day: 5, category: 'work', startTime: '09:00', endTime: '11:30', notes: 'Entregables' },
+        { id: 'd13', title: 'Salida con Amigos', day: 5, category: 'personal', startTime: '19:00', endTime: '22:00', notes: 'Cena' },
 
-        // Sábado
-        { id: 'd17', title: 'Proyecto Personal', day: 6, category: 'work', startTime: '10:00', endTime: '13:00', notes: 'Portfolio 2026' },
-        { id: 'd18', title: 'Ciclismo de Ruta', day: 6, category: 'wellness', startTime: '15:30', endTime: '18:00', notes: '30km ruta norte' },
-
-        // Domingo
-        { id: 'd19', title: 'Planificación Semanal', day: 7, category: 'academic', startTime: '17:00', endTime: '18:30', notes: 'Revisar metas' },
-        { id: 'd20', title: 'Descanso Familiar', day: 7, category: 'personal', startTime: '12:00', endTime: '15:00', notes: 'Almuerzo' }
+        // Fin de semana
+        { id: 'd14', title: 'Proyecto Personal', day: 6, category: 'work', startTime: '10:00', endTime: '13:00', notes: 'Portfolio' },
+        { id: 'd15', title: 'Descanso Familiar', day: 7, category: 'personal', startTime: '12:00', endTime: '15:00', notes: 'Almuerzo' }
       ];
 
       persistEvents();
       renderCalendar();
-      showToast('Horario demo cargado con éxito');
+      showToast('Horario de ejemplo cargado');
     }
 
     function timeToMinutes(timeStr) {
@@ -803,7 +854,6 @@
           events = [];
         }
       } else {
-        // Si es la primera visita, cargar plantilla equilibrada
         loadDemoSchedule();
       }
     }
