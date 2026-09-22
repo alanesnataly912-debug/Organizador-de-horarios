@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimeMaster Pro | Organizador Semanal Inteligente</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Google: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos personalizados para el scrollbar y cuadrícula de impresión */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(107, 114, 128, 0.6);
+    }
+    
+    /* Configuración para Impresión y Exportación limpia */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: white !important;
+        color: black !important;
+        overflow: visible !important;
+      }
+      .print-shadow-none {
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+      }
+      #calendarGridContainer {
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .event-item {
+        box-shadow: none !important;
+        border-width: 1px !important;
+      }
+    }
+    
+    /* Efecto sutil de fondo cuadriculado */
+    .time-slot {
+      height: 52px;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .dark .time-slot {
+      border-bottom: 1px dashed #27272a;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-zinc-950 text-slate-800 dark:text-zinc-100 font-sans min-h-screen flex flex-col transition-colors duration-200">
+  
+  <header class="no-print bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200/80 dark:border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logotipo & Título -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+          <i data-lucide="calendar-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            Organizador Semanal
+            <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800">Pro</span>
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-zinc-400 hidden sm:block">Planifica y optimiza tu tiempo semanal con balance y foco</p>
+        </div>
+      </div>
+
+      <!-- Acciones Principales -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Modo Oscuro / Claro -->
+        <button id="themeToggleBtn" title="Cambiar tema" class="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-700 transition">
+          <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+
+        <!-- Botón Imprimir / PDF -->
+        <button onclick="window.print()" class="hidden md:inline-flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-700 transition shadow-sm">
+          <i data-lucide="printer" class="w-3.5 h-3.5 text-slate-500"></i>
+          Imprimir / PDF
+        </button>
+
+        <!-- Menú desplegable más opciones -->
+        <div class="relative inline-block text-left">
+          <button id="moreActionsBtn" class="p-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-50 transition" title="Opciones avanzadas">
+            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+          </button>
+          
+          <div id="moreActionsMenu" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 shadow-xl border border-slate-100 dark:border-zinc-800 py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+            <button onclick="loadDemoSchedule()" class="w-full text-left px-4 py-2 text-xs text-slate-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-600 flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-500"></i> Cargar Horario Demo
+            </button>
+            <button onclick="clearAllEvents()" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Borrar Todo
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón Agregar Actividad (CTA) -->
+        <button onclick="openModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm shadow-indigo-600/30 transition duration-150">
+          <i data-lucide="plus" class="w-4 h-4 stroke-[2.5]"></i>
+          <span class="hidden sm:inline">Nueva Actividad</span>
+          <span class="sm:hidden">Añadir</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 flex-1 w-full flex flex-col gap-4">
+    
+    <!-- Barra de Estado, Estadísticas e Indicadores por Categoría -->
+    <section class="no-print bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        
+        <!-- Totales rápidos -->
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 dark:text-zinc-400 font-medium">Horas Programadas Semanalmente</div>
+            <div class="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              <span id="totalHoursCount">0.0</span> hrs
+              <span id="totalEventsCount" class="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">0 bloques</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas por etiquetas -->
+        <div id="categoryStatsContainer" class="flex flex-wrap items-center gap-2 text-xs">
+          <!-- Inyectado dinámicamente con JS -->
+        </div>
+
+        <!-- Filtro por Categoría -->
+        <div class="flex items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100 dark:border-zinc-800">
+          <label for="categoryFilter" class="text-xs font-semibold text-slate-500 dark:text-zinc-400 whitespace-nowrap">Filtrar:</label>
+          <select id="categoryFilter" onchange="renderCalendar()" class="bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-200 text-xs rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="all">Todas las categorías</option>
+            <option value="academic">Académico / Estudio</option>
+            <option value="work">Trabajo / Proyectos</option>
+            <option value="languages">Idiomas</option>
+            <option value="wellness">Deporte & Salud</option>
+            <option value="personal">Personal / Ocio</option>
+          </select>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Contenedor del Calendario Semanal -->
+    <div class="bg-white dark:bg-zinc-900 border border-slate-200/90 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden flex flex-col flex-1 print-shadow-none">
+      
+      <!-- Encabezado de los Días -->
+      <div class="grid grid-cols-8 border-b border-slate-200 dark:border-zinc-800 bg-slate-100/60 dark:bg-zinc-800/60 font-semibold text-xs text-slate-600 dark:text-zinc-300">
+        <!-- Columna de Horas (Primera Columna) -->
+        <div class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-800 text-slate-400 font-medium">
+          <span class="hidden sm:inline">Horario</span>
+          <i data-lucide="clock" class="w-4 h-4 mx-auto sm:hidden"></i>
+        </div>
+        
+        <!-- Columnas Lunes a Domingo -->
+        <div class="py-3 px-1 text-center border-r border-slate-200 dark:border-zinc-800 font-semibold">Lunes</div>
+        <div class="py-3 px-1 text-center border-r border-slate-200 dark:border-zinc-800 font-semibold">Martes</div>
+        <div class="py-3 px-1 text-center border-r border-slate-200 dark:border-zinc-800 font-semibold">Miércoles</div>
+        <div class="py-3 px-1 text-center border-r border-slate-200 dark:border-zinc-800 font-semibold">Jueves</div>
+        <div class="py-3 px-1 text-center border-r border-slate-200 dark:border-zinc-800 font-semibold">Viernes</div>
+        <div class="py-3 px-1 text-center border-r border-slate-200 dark:border-zinc-800 font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/40 dark:bg-indigo-950/20">Sábado</div>
+        <div class="py-3 px-1 text-center font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50/40 dark:bg-indigo-950/20">Domingo</div>
+      </div>
+
+      <!-- Cuadrícula con Scroll Suave de Horarios -->
+      <div id="calendarGridContainer" class="overflow-y-auto max-h-[calc(100vh-290px)] relative select-none">
+        <div id="calendarMatrix" class="grid grid-cols-8 relative min-w-[650px]">
+          <!-- Columnas generadas vía JavaScript -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="eventModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl p-6 relative transform scale-95 transition-transform duration-200" id="modalDialogBox">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-zinc-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 flex items-center justify-center">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          </div>
+          <h3 id="modalTitle" class="text-base font-bold text-slate-900 dark:text-white">Nueva Actividad</h3>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Formulario -->
+      <form id="activityForm" onsubmit="saveEvent(event)" class="mt-4 space-y-4">
+        <input type="hidden" id="eventId">
+
+        <!-- Título -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Nombre de la Actividad</label>
+          <input type="text" id="eventTitle" required placeholder="Ej. Inglés B2, Algoritmos, Entrenamiento..." class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
+        </div>
+
+        <!-- Día y Categoría -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Día</label>
+            <select id="eventDay" required class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="1">Lunes</option>
+              <option value="2">Martes</option>
+              <option value="3">Miércoles</option>
+              <option value="4">Jueves</option>
+              <option value="5">Viernes</option>
+              <option value="6">Sábado</option>
+              <option value="7">Domingo</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Categoría</label>
+            <select id="eventCategory" required class="w-full px-3 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option value="academic">📚 Académico / Estudio</option>
+              <option value="work">💼 Trabajo / Proyectos</option>
+              <option value="languages">🌍 Idiomas</option>
+              <option value="wellness">💪 Deporte & Salud</option>
+              <option value="personal">☕ Personal / Ocio</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Horas Inicio y Fin -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Hora Inicio</label>
+            <input type="time" id="eventStartTime" required min="06:00" max="23:00" step="1800" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Hora Fin</label>
+            <input type="time" id="eventEndTime" required min="06:30" max="23:30" step="1800" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+        </div>
+
+        <!-- Notas / Aula / Enlace -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-zinc-400 mb-1.5">Notas o Ubicación (Opcional)</label>
+          <input type="text" id="eventNotes" placeholder="Ej. Aula 204, Zoom, Leer págs. 40-70" class="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <!-- Mensaje de error / validación -->
+        <div id="modalErrorMsg" class="hidden text-xs text-rose-500 font-medium bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-lg border border-rose-200 dark:border-rose-900/60">
+        </div>
+
+        <!-- Footer / Botones -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-zinc-800">
+          <button type="button" id="btnDeleteEvent" onclick="deleteCurrentEvent()" class="hidden text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 px-3 py-2 rounded-xl transition">
+            Eliminar
+          </button>
+          
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-xl transition">
+              Cancelar
+            </button>
+            <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition">
+              Guardar Actividad
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-medium py-2.5 px-4 rounded-xl shadow-xl">
+    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 dark:text-emerald-600"></i>
+    <span id="toastMessage">Acción completada</span>
+  </div>
+
+  <script>
+    // Parámetros de configuración del horario
+    const START_HOUR = 6;  // 06:00
+    const END_HOUR = 23;   // 23:00 (17 horas totales)
+    const PIXELS_PER_HOUR = 52; // Altura en píxeles por bloque de hora
+
+    // Definición de Categorías con paletas de color modernas (Tailwind tokens)
+    const CATEGORIES = {
+      academic: {
+        name: 'Académico / Estudio',
+        bg: 'bg-indigo-100/90 dark:bg-indigo-950/70',
+        border: 'border-indigo-400 dark:border-indigo-600',
+        text: 'text-indigo-900 dark:text-indigo-200',
+        indicator: 'bg-indigo-500',
+        badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300'
+      },
+      work: {
+        name: 'Trabajo / Proyectos',
+        bg: 'bg-sky-100/90 dark:bg-sky-950/70',
+        border: 'border-sky-400 dark:border-sky-600',
+        text: 'text-sky-900 dark:text-sky-200',
+        indicator: 'bg-sky-500',
+        badge: 'bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300'
+      },
+      languages: {
+        name: 'Idiomas',
+        bg: 'bg-amber-100/90 dark:bg-amber-950/70',
+        border: 'border-amber-400 dark:border-amber-600',
+        text: 'text-amber-900 dark:text-amber-200',
+        indicator: 'bg-amber-500',
+        badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300'
+      },
+      wellness: {
+        name: 'Deporte & Salud',
+        bg: 'bg-emerald-100/90 dark:bg-emerald-950/70',
+        border: 'border-emerald-400 dark:border-emerald-600',
+        text: 'text-emerald-900 dark:text-emerald-200',
+        indicator: 'bg-emerald-500',
+        badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300'
+      },
+      personal: {
+        name: 'Personal / Ocio',
+        bg: 'bg-fuchsia-100/90 dark:bg-fuchsia-950/70',
+        border: 'border-fuchsia-400 dark:border-fuchsia-600',
+        text: 'text-fuchsia-900 dark:text-fuchsia-200',
+        indicator: 'bg-fuchsia-500',
+        badge: 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/60 dark:text-fuchsia-300'
+      }
+    };
+
+    // Colección de eventos guardados en LocalStorage
+    let events = [];
+
+    // Inicialización del entorno
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadEventsFromStorage();
+      buildGridBackground();
+      renderCalendar();
+      lucide.createIcons();
+
+      // Cerrar menú emergente al hacer clic fuera
+      document.addEventListener('click', (e) => {
+        const menu = document.getElementById('moreActionsMenu');
+        const btn = document.getElementById('moreActionsBtn');
+        if (!btn.contains(e.target) && !menu.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      });
+
+      document.getElementById('moreActionsBtn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('moreActionsMenu').classList.toggle('hidden');
+      });
+    });
+
+    function initTheme() {
+      const isDark = localStorage.getItem('theme') === 'dark' || 
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        lucide.createIcons();
+      });
+    }
+
+    function buildGridBackground() {
+      const matrix = document.getElementById('calendarMatrix');
+      matrix.innerHTML = '';
+
+      // Columna 0: Horas (Time labels)
+      const timeCol = document.createElement('div');
+      timeCol.className = 'border-r border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50';
+
+      for (let h = START_HOUR; h < END_HOUR; h++) {
+        const cell = document.createElement('div');
+        cell.className = 'time-slot flex items-start justify-center pt-1 text-[11px] font-semibold text-slate-400 dark:text-zinc-500';
+        cell.innerText = `${String(h).padStart(2, '0')}:00`;
+        timeCol.appendChild(cell);
+      }
+      matrix.appendChild(timeCol);
+
+      // Columnas 1 a 7: Días de la semana (Lunes a Domingo)
+      for (let day = 1; day <= 7; day++) {
+        const dayCol = document.createElement('div');
+        dayCol.id = `day-column-${day}`;
+        dayCol.className = 'relative border-r border-slate-200 dark:border-zinc-800 last:border-r-0 hover:bg-indigo-50/20 dark:hover:bg-indigo-950/10 transition-colors duration-150 cursor-pointer';
+
+        // Permitir clic para crear un evento rápido a esa hora
+        dayCol.addEventListener('click', (e) => {
+          if (e.target === dayCol || e.target.classList.contains('time-slot')) {
+            const rect = dayCol.getBoundingClientRect();
+            const offsetY = e.clientY - rect.top;
+            const hourOffset = Math.floor(offsetY / PIXELS_PER_HOUR);
+            const clickedHour = Math.min(Math.max(START_HOUR + hourOffset, START_HOUR), END_HOUR - 1);
+            
+            const startTime = `${String(clickedHour).padStart(2, '0')}:00`;
+            const endTime = `${String(clickedHour + 1).padStart(2, '0')}:00`;
+            openModal(null, day, startTime, endTime);
+          }
+        });
+
+        // Crear guías visuales de cada hora
+        for (let h = START_HOUR; h < END_HOUR; h++) {
+          const slot = document.createElement('div');
+          slot.className = 'time-slot';
+          dayCol.appendChild(slot);
+        }
+
+        matrix.appendChild(dayCol);
+      }
+    }
+
+    function renderCalendar() {
+      // Limpiar bloques existentes en las columnas de días
+      for (let d = 1; d <= 7; d++) {
+        const dayCol = document.getElementById(`day-column-${d}`);
+        if (dayCol) {
+          const existingBlocks = dayCol.querySelectorAll('.event-item');
+          existingBlocks.forEach(b => b.remove());
+        }
+      }
+
+      const activeFilter = document.getElementById('categoryFilter').value;
+      let filteredEvents = events;
+
+      if (activeFilter !== 'all') {
+        filteredEvents = events.filter(e => e.category === activeFilter);
+      }
+
+      // Dibujar cada bloque según día y horas
+      filteredEvents.forEach(evt => {
+        const dayCol = document.getElementById(`day-column-${evt.day}`);
+        if (!dayCol) return;
+
+        const startMinutes = timeToMinutes(evt.startTime);
+        const endMinutes = timeToMinutes(evt.endTime);
+        const baseMinutes = START_HOUR * 60;
+
+        // Calcular posición vertical y altura
+        const topPx = ((startMinutes - baseMinutes) / 60) * PIXELS_PER_HOUR;
+        const durationHours = (endMinutes - startMinutes) / 60;
+        const heightPx = Math.max(durationHours * PIXELS_PER_HOUR - 2, 24);
+
+        const cat = CATEGORIES[evt.category] || CATEGORIES.academic;
+
+        const card = document.createElement('div');
+        card.className = `event-item absolute left-1 right-1 rounded-xl p-2 text-xs border ${cat.bg} ${cat.border} ${cat.text} shadow-sm hover:shadow-md transition-all duration-150 overflow-hidden flex flex-col justify-between group z-10`;
+        card.style.top = `${topPx + 1}px`;
+        card.style.height = `${heightPx}px`;
+
+        card.innerHTML = `
+          <div class="leading-snug">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-bold truncate text-[11px] sm:text-xs">${escapeHtml(evt.title)}</span>
+              <button onclick="deleteEventQuick(event, '${evt.id}')" title="Eliminar rápido" class="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-white/60 dark:hover:bg-zinc-800 transition">
+                <i data-lucide="x" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <div class="text-[10px] font-medium opacity-80 mt-0.5 flex items-center gap-1">
+              <span>${evt.startTime} - ${evt.endTime}</span>
+            </div>
+          </div>
+          ${evt.notes ? `<div class="text-[10px] opacity-75 truncate mt-auto italic">${escapeHtml(evt.notes)}</div>` : ''}
+        `;
+
+        // Al hacer click, abrir para editar
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openModal(evt.id);
+        });
+
+        dayCol.appendChild(card);
+      });
+
+      updateStats();
+      lucide.createIcons();
+    }
+
+    function updateStats() {
+      let totalMinutes = 0;
+      const categoryMinutes = {
+        academic: 0,
+        work: 0,
+        languages: 0,
+        wellness: 0,
+        personal: 0
+      };
+
+      events.forEach(e => {
+        const diff = timeToMinutes(e.endTime) - timeToMinutes(e.startTime);
+        if (diff > 0) {
+          totalMinutes += diff;
+          if (categoryMinutes[e.category] !== undefined) {
+            categoryMinutes[e.category] += diff;
+          }
+        }
+      });
+
+      const totalHours = (totalMinutes / 60).toFixed(1);
+      document.getElementById('totalHoursCount').innerText = totalHours;
+      document.getElementById('totalEventsCount').innerText = `${events.length} actividad${events.length === 1 ? '' : 'es'}`;
+
+      // Actualizar visual de categorías
+      const container = document.getElementById('categoryStatsContainer');
+      container.innerHTML = '';
+
+      Object.keys(CATEGORIES).forEach(key => {
+        const mins = categoryMinutes[key];
+        const hrs = (mins / 60).toFixed(1);
+        const cat = CATEGORIES[key];
+
+        const pill = document.createElement('div');
+        pill.className = `flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200/70 dark:border-zinc-800 bg-white dark:bg-zinc-800/80`;
+        pill.innerHTML = `
+          <span class="w-2 h-2 rounded-full ${cat.indicator}"></span>
+          <span class="font-medium text-slate-700 dark:text-zinc-300 text-[11px]">${cat.name.split('/')[0]}:</span>
+          <span class="font-bold text-slate-900 dark:text-white text-[11px]">${hrs}h</span>
+        `;
+        container.appendChild(pill);
+      });
+    }
+
+    function openModal(id = null, defaultDay = 1, defaultStart = '08:00', defaultEnd = '09:00') {
+      const modal = document.getElementById('eventModal');
+      const dialog = document.getElementById('modalDialogBox');
+      const errorMsg = document.getElementById('modalErrorMsg');
+      errorMsg.classList.add('hidden');
+
+      const deleteBtn = document.getElementById('btnDeleteEvent');
+
+      if (id) {
+        // Modo Edición
+        const evt = events.find(e => e.id === id);
+        if (!evt) return;
+
+        document.getElementById('modalTitle').innerText = 'Editar Actividad';
+        document.getElementById('eventId').value = evt.id;
+        document.getElementById('eventTitle').value = evt.title;
+        document.getElementById('eventDay').value = evt.day;
+        document.getElementById('eventCategory').value = evt.category;
+        document.getElementById('eventStartTime').value = evt.startTime;
+        document.getElementById('eventEndTime').value = evt.endTime;
+        document.getElementById('eventNotes').value = evt.notes || '';
+        deleteBtn.classList.remove('hidden');
+      } else {
+        // Modo Nuevo
+        document.getElementById('modalTitle').innerText = 'Nueva Actividad';
+        document.getElementById('eventId').value = '';
+        document.getElementById('eventTitle').value = '';
+        document.getElementById('eventDay').value = defaultDay;
+        document.getElementById('eventCategory').value = 'academic';
+        document.getElementById('eventStartTime').value = defaultStart;
+        document.getElementById('eventEndTime').value = defaultEnd;
+        document.getElementById('eventNotes').value = '';
+        deleteBtn.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        dialog.classList.remove('scale-95');
+      }, 10);
+      document.getElementById('eventTitle').focus();
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('eventModal');
+      const dialog = document.getElementById('modalDialogBox');
+
+      modal.classList.add('opacity-0');
+      dialog.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
+
+    function saveEvent(e) {
+      e.preventDefault();
+      const id = document.getElementById('eventId').value;
+      const title = document.getElementById('eventTitle').value.trim();
+      const day = parseInt(document.getElementById('eventDay').value, 10);
+      const category = document.getElementById('eventCategory').value;
+      const startTime = document.getElementById('eventStartTime').value;
+      const endTime = document.getElementById('eventEndTime').value;
+      const notes = document.getElementById('eventNotes').value.trim();
+
+      const errorBox = document.getElementById('modalErrorMsg');
+
+      // Validaciones lógicas
+      const startMin = timeToMinutes(startTime);
+      const endMin = timeToMinutes(endTime);
+
+      if (endMin <= startMin) {
+        errorBox.innerText = 'La hora de fin debe ser posterior a la hora de inicio.';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      if (startMin < START_HOUR * 60 || endMin > END_HOUR * 60) {
+        errorBox.innerText = `El horario permitido está entre las ${String(START_HOUR).padStart(2, '0')}:00 y ${String(END_HOUR).padStart(2, '0')}:00.`;
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      // Validar superposición en el mismo día (opcionalmente amigable)
+      const overlap = events.find(item => {
+        if (id && item.id === id) return false;
+        if (item.day !== day) return false;
+        const itemStart = timeToMinutes(item.startTime);
+        const itemEnd = timeToMinutes(item.endTime);
+        return (startMin < itemEnd && endMin > itemStart);
+      });
+
+      if (overlap) {
+        errorBox.innerText = `Atención: Se superpone con "${overlap.title}" (${overlap.startTime} - ${overlap.endTime}). Ajusta el horario.`;
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      if (id) {
+        // Actualizar
+        const index = events.findIndex(item => item.id === id);
+        if (index !== -1) {
+          events[index] = { id, title, day, category, startTime, endTime, notes };
+        }
+        showToast('Actividad actualizada con éxito');
+      } else {
+        // Crear nuevo
+        const newEvent = {
+          id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+          title,
+          day,
+          category,
+          startTime,
+          endTime,
+          notes
+        };
+        events.push(newEvent);
+        showToast('Actividad añadida al horario');
+      }
+
+      persistEvents();
+      renderCalendar();
+      closeModal();
+    }
+
+    function deleteCurrentEvent() {
+      const id = document.getElementById('eventId').value;
+      if (!id) return;
+
+      events = events.filter(e => e.id !== id);
+      persistEvents();
+      renderCalendar();
+      closeModal();
+      showToast('Actividad eliminada');
+    }
+
+    function deleteEventQuick(event, id) {
+      event.stopPropagation();
+      events = events.filter(e => e.id !== id);
+      persistEvents();
+      renderCalendar();
+      showToast('Actividad eliminada');
+    }
+
+    function clearAllEvents() {
+      document.getElementById('moreActionsMenu').classList.add('hidden');
+      if (events.length === 0) {
+        showToast('No hay actividades para borrar');
+        return;
+      }
+      // Reemplazo limpio y accesible sin usar confirm()
+      events = [];
+      persistEvents();
+      renderCalendar();
+      showToast('Horario limpiado por completo');
+    }
+
+    function loadDemoSchedule() {
+      document.getElementById('moreActionsMenu').classList.add('hidden');
+      events = [
+        // Lunes
+        { id: 'd1', title: 'Cálculo Avanzado', day: 1, category: 'academic', startTime: '08:00', endTime: '10:00', notes: 'Aula Magna 301' },
+        { id: 'd2', title: 'Entrenamiento Gimnasio', day: 1, category: 'wellness', startTime: '10:30', endTime: '12:00', notes: 'Fuerza y movilidad' },
+        { id: 'd3', title: 'Desarrollo Proyecto Web', day: 1, category: 'work', startTime: '14:00', endTime: '17:00', notes: 'Sprint Review' },
+        { id: 'd4', title: 'Inglés Conversacional', day: 1, category: 'languages', startTime: '18:00', endTime: '19:30', notes: 'Práctica Discord' },
+
+        // Martes
+        { id: 'd5', title: 'Arquitectura Software', day: 2, category: 'academic', startTime: '08:30', endTime: '11:00', notes: 'Módulo Patrones' },
+        { id: 'd6', title: 'Reunión de Equipo', day: 2, category: 'work', startTime: '14:00', endTime: '15:30', notes: 'Google Meet' },
+        { id: 'd7', title: 'Lectura / Ocio', day: 2, category: 'personal', startTime: '19:30', endTime: '21:00', notes: 'Capítulo 5 Sci-Fi' },
+
+        // Miércoles
+        { id: 'd8', title: 'Estructuras de Datos', day: 3, category: 'academic', startTime: '08:00', endTime: '10:00', notes: 'Laboratorio' },
+        { id: 'd9', title: 'Running & Cardio', day: 3, category: 'wellness', startTime: '10:30', endTime: '11:30', notes: 'Parque central' },
+        { id: 'd10', title: 'Trabajo Remoto', day: 3, category: 'work', startTime: '14:00', endTime: '18:00', notes: 'Implementación API' },
+
+        // Jueves
+        { id: 'd11', title: 'Alemán Básico', day: 4, category: 'languages', startTime: '09:00', endTime: '10:30', notes: 'Vocabulario' },
+        { id: 'd12', title: 'Inteligencia Artificial', day: 4, category: 'academic', startTime: '11:00', endTime: '13:00', notes: 'Redes Neuronales' },
+        { id: 'd13', title: 'Revisión y Tareas', day: 4, category: 'academic', startTime: '16:00', endTime: '18:00', notes: 'Biblioteca' },
+
+        // Viernes
+        { id: 'd14', title: 'Gestión de Proyectos', day: 5, category: 'work', startTime: '09:00', endTime: '11:30', notes: 'Entregables' },
+        { id: 'd15', title: 'Yoga & Estiramiento', day: 5, category: 'wellness', startTime: '12:00', endTime: '13:00', notes: 'Relajación' },
+        { id: 'd16', title: 'Salida con Amigos', day: 5, category: 'personal', startTime: '19:00', endTime: '22:00', notes: 'Cena & Café' },
+
+        // Sábado
+        { id: 'd17', title: 'Proyecto Personal', day: 6, category: 'work', startTime: '10:00', endTime: '13:00', notes: 'Portfolio 2026' },
+        { id: 'd18', title: 'Ciclismo de Ruta', day: 6, category: 'wellness', startTime: '15:30', endTime: '18:00', notes: '30km ruta norte' },
+
+        // Domingo
+        { id: 'd19', title: 'Planificación Semanal', day: 7, category: 'academic', startTime: '17:00', endTime: '18:30', notes: 'Revisar metas' },
+        { id: 'd20', title: 'Descanso Familiar', day: 7, category: 'personal', startTime: '12:00', endTime: '15:00', notes: 'Almuerzo' }
+      ];
+
+      persistEvents();
+      renderCalendar();
+      showToast('Horario demo cargado con éxito');
+    }
+
+    function timeToMinutes(timeStr) {
+      if (!timeStr) return 0;
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function(m) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[m];
+      });
+    }
+
+    function persistEvents() {
+      localStorage.setItem('timemaster_events_v2', JSON.stringify(events));
+    }
+
+    function loadEventsFromStorage() {
+      const saved = localStorage.getItem('timemaster_events_v2');
+      if (saved) {
+        try {
+          events = JSON.parse(saved);
+        } catch (e) {
+          events = [];
+        }
+      } else {
+        // Si es la primera visita, cargar plantilla equilibrada
+        loadDemoSchedule();
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      text.innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
